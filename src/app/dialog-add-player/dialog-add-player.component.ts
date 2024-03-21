@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,9 +21,14 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './dialog-add-player.component.scss',
 })
 export class DialogAddPlayerComponent {
-  name?: string;
+  name: string = '';
+
+  constructor(private dialogRef: MatDialogRef<DialogAddPlayerComponent>,
+    ) {
+
+  }
 
   onNoClick(): void {
-    // this.dialogRef.close();
+    this.dialogRef.close();
   }
 }

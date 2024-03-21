@@ -6,16 +6,16 @@
 
     <div class="card_stack">
         @for (item of [0, 1, 2, 3]; track i; let i = $index) {
-            <img [ngStyle]="{'right.px': i * 5}" src="/assets/img/cards/card_cover.png" alt="">            
+            <img [ngStyle]="{'right.px': i * 5}" src="assets/img/cards/purple_back.png" alt="">            
         }
-        <img (click)="takeCard()" class="top_card" style="right: 25px" src="/assets/img/cards/card_cover.png" alt="">
+        <img (click)="takeCard()" class="top_card" style="right: 25px" src="assets/img/cards/purple_back.png" alt="">
 
         @for (playedCard of game?.playedCards; track $index) {
-            <img class="played_card" src="/assets/img/cards/{{ playedCard }}.png">
+            <img class="played_card" src="assets/img/cards/{{ playedCard }}.png">
         }        
 
         @if(pickCardAnimation) {
-            <img (click)="takeCard()"  class="pick_card" style="right: 25px" src="/assets/img/cards/{{ currentCard }}.png" alt="">
+            <img (click)="takeCard()"  class="pick_card" style="right: 25px" src="assets/img/cards/{{ currentCard }}.png" alt="">
         }
     </div>
 
