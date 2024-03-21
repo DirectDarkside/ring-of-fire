@@ -1,5 +1,5 @@
 @for (player of game?.players; track i; let i = $index) {
-    <app-player [name]="player" [ngStyle]="{'top.px': 100 + (i * 120)}" class="player_position"></app-player>
+    <app-player [name]="player" [ngStyle]="{'top.px': 100 + (i * 90)}" [playerActive]="i == game?.currentPlayer" class="player_position"></app-player>
 }
 
 <div class="field">
@@ -20,6 +20,8 @@
     </div>
 
 </div>
+
+<app-game-info [card]="currentCard" class="pin_bottom"></app-game-info>
 
 <button mat-fab color="primary" (click)="openDialog()" class="btn_add">
     <mat-icon>add</mat-icon>
