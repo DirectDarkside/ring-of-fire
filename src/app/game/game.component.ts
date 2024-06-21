@@ -67,7 +67,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   takeCard() {
     if (!this.game.pickCardAnimation) {
-      this.game.currentCard = this.game?.stack.pop();
+      this.game.currentCard = String(this.game?.stack.pop());
       this.game.pickCardAnimation = true;
       this.game!.currentPlayer = this.game!.currentPlayer + 1; 
       this.game!.currentPlayer = this.game!.currentPlayer % this.game!.players.length;
