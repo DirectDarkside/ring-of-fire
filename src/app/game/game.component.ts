@@ -44,7 +44,6 @@ export class GameComponent implements OnInit, OnDestroy {
     this.route.params.subscribe((params) => {
       this.gameId = params['id'];
       this.currentDoc$ = onSnapshot(doc(this.firestore, "games", params['id']), (doc) => {
-        console.log("Current data: ", doc.data());
         const docData = doc.data();
         this.game.currentPlayer = docData ? docData['currentPlayer'] : 0;
         this.game.playedCards = docData ? docData['playedCards'] : [];
