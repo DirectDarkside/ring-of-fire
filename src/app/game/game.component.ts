@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnDestroy, OnInit, SimpleChanges, inject } from '@angular/core';
 import { Game } from '../../models/game';
 import { PlayerComponent } from '../player/player.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,8 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogAddPlayerComponent } from '../dialog-add-player/dialog-add-player.component';
 import { GameInfoComponent } from '../game-info/game-info.component';
+import { Firestore, addDoc, collection, collectionData, doc, onSnapshot, updateDoc } from '@angular/fire/firestore';
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-game',
   standalone: true,
@@ -24,33 +26,59 @@ import { GameInfoComponent } from '../game-info/game-info.component';
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
 })
-export class GameComponent implements OnInit {
-  pickCardAnimation = false;
-  currentCard: string | undefined;
-  game: Game | undefined;
+export class GameComponent implements OnInit, OnDestroy {
+  
+  game!: Game;
+  private firestore: Firestore = inject(Firestore);
+  items$:any;
+  currentDoc$:any;
+  gameId = '';
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, private route: ActivatedRoute) {
+    // const aCollection = collection(this.firestore, 'games')
+    // this.items$ = collectionData(aCollection);
+  }
 
   ngOnInit(): void {
     this.newGame();
+    this.route.params.subscribe((params) => {
+      this.gameId = params['id'];
+      this.currentDoc$ = onSnapshot(doc(this.firestore, "games", params['id']), (doc) => {
+        console.log("Current data: ", doc.data());
+        const docData = doc.data();
+        this.game.currentPlayer = docData ? docData['currentPlayer'] : 0;
+        this.game.playedCards = docData ? docData['playedCards'] : [];
+        this.game.players = docData ? docData['players'] : [];
+        this.game.stack = docData ? docData['stack'] : [];
+        this.game.currentCard = docData ? docData['currentCard'] : '';
+        this.game.pickCardAnimation = docData ? docData['pickCardAnimation'] : false;
+    });
+    });
   }
 
-  newGame() {
+  ngOnDestroy(): void {
+    // this.items$.unsubscribe();
+    this.currentDoc$.unsubscribe();
+    console.log('Items destoyed');
+  }
+
+  async newGame() {
     this.game = new Game();
-    console.log(this.game);
   }
 
   takeCard() {
-    if (!this.pickCardAnimation) {
-      this.currentCard = this.game?.stack.pop();
-      this.pickCardAnimation = true;
+    if (!this.game.pickCardAnimation) {
+      this.game.currentCard = this.game?.stack.pop();
+      this.game.pickCardAnimation = true;
       this.game!.currentPlayer = this.game!.currentPlayer + 1; 
       this.game!.currentPlayer = this.game!.currentPlayer % this.game!.players.length;
+      this.saveGame();
       setTimeout(() => {
-        if (this.currentCard) {
-          this.game?.playedCards.push(this.currentCard);
+        if (this.game.currentCard) {
+          this.game?.playedCards.push(this.game.currentCard);
         }
-        this.pickCardAnimation = false;
+        this.game.pickCardAnimation = false;
+        this.saveGame();
       }, 1000);
     }
   }
@@ -61,7 +89,13 @@ export class GameComponent implements OnInit {
     dialogRef.afterClosed().subscribe((name: string) => {
       if(name && name.length > 0) {
         this.game?.players.push(name);
+        this.saveGame();
       }
     });
+  }
+
+  async saveGame() {
+    const gameRef = doc(this.firestore, "games", this.gameId);
+    await updateDoc(gameRef, this.game.toJson());
   }
 }
