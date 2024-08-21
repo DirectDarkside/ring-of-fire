@@ -58,7 +58,7 @@ export class GameComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // this.items$.unsubscribe();
     this.currentDoc$.unsubscribe();
-    console.log('Items destoyed');
+    console.log('Items destoyed!');
   }
 
   async newGame() {
